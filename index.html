@@ -1,424 +1,271 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>GitHub Repository Manager</title>
-    <style>
-      :root {
-        color-scheme: dark;
-        --bg: #0d1117;
-        --panel: #161b22;
-        --border: #30363d;
-        --text: #e6edf3;
-        --muted: #8b949e;
-        --green: #3fb950;
-        --yellow: #d29922;
-        --red: #f85149;
-        --blue: #58a6ff;
-      }
-      * {
-        box-sizing: border-box;
-      }
-      body {
-        margin: 0;
-        padding: 30px;
-        background: var(--bg);
-        color: var(--text);
-        font:
-          14px -apple-system,
-          BlinkMacSystemFont,
-          sans-serif;
-      }
-      main {
-        max-width: 1200px;
-        margin: auto;
-      }
-      header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 15px;
-        flex-wrap: wrap;
-        margin-bottom: 28px;
-      }
-      h1 {
-        font-size: 25px;
-        margin: 0 0 7px;
-      }
-      p {
-        color: var(--muted);
-        margin: 0;
-      }
-      button {
-        background: #238636;
-        color: white;
-        border: 0;
-        border-radius: 7px;
-        padding: 12px 20px;
-        font-weight: 600;
-        cursor: pointer;
-      }
-      button:disabled {
-        opacity: 0.5;
-        cursor: wait;
-      }
-      .cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-        gap: 15px;
-        margin-bottom: 25px;
-      }
-      .card,
-      .panel {
-        background: var(--panel);
-        border: 1px solid var(--border);
-        border-radius: 10px;
-        padding: 20px;
-      }
-      .card small {
-        color: var(--muted);
-      }
-      .number {
-        font-size: 30px;
-        font-weight: 700;
-        margin-top: 9px;
-      }
-      .green {
-        color: var(--green);
-      }
-      .yellow {
-        color: var(--yellow);
-      }
-      .red {
-        color: var(--red);
-      }
-      .blue {
-        color: var(--blue);
-      }
-      .panel {
-        margin-bottom: 20px;
-      }
-      .panel h2 {
-        font-size: 17px;
-        margin: 0 0 16px;
-      }
-      .toolbar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
-        margin-bottom: 15px;
-      }
-      input {
-        background: var(--bg);
-        color: var(--text);
-        border: 1px solid var(--border);
-        border-radius: 6px;
-        padding: 10px;
-        width: 260px;
-        max-width: 100%;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-      th,
-      td {
-        text-align: left;
-        padding: 13px 10px;
-        border-bottom: 1px solid var(--border);
-        vertical-align: top;
-      }
-      th {
-        color: var(--muted);
-        font-weight: 500;
-      }
-      td small {
-        display: block;
-        color: var(--muted);
-        margin-top: 5px;
-      }
-      .status {
-        display: inline-block;
-        padding: 4px 8px;
-        border-radius: 20px;
-        font-size: 12px;
-        background: #30363d;
-      }
-      .status.clean {
-        color: var(--green);
-      }
-      .status.dirty {
-        color: var(--yellow);
-      }
-      .status.ahead {
-        color: var(--blue);
-      }
-      .status.behind {
-        color: var(--red);
-      }
-      #message {
-        margin: 15px 0;
-        color: var(--muted);
-        white-space: pre-wrap;
-      }
-      .files {
-        color: var(--muted);
-        font-size: 12px;
-      }
-      footer {
-        color: var(--muted);
-        margin-top: 25px;
-      }
-      @media (max-width: 650px) {
-        body {
-          padding: 15px;
-        }
-        table {
-          font-size: 12px;
-        }
-        th,
-        td {
-          padding: 10px 5px;
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <main>
-      <header>
-        <div>
-          <h1>GitHub Repository Manager</h1>
-          <p id="lastUpdated">Loading repository information...</p>
-        </div>
-        <button id="syncButton" onclick="syncAll()">↻ Sync All</button>
-      </header>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GitHub Repository Analytics</title>
+<style>
+:root{
+  color-scheme:dark;--bg:#071a35;--panel:#0d2a50;--panel2:#10345f;
+  --line:#1c4774;--text:#e8f4ff;--muted:#91afd0;--blue:#239cf4;
+  --cyan:#26d8e8;--green:#28dfb1;--orange:#ffad68;--red:#ff6c82;
+}
+*{box-sizing:border-box}
+body{margin:0;background:linear-gradient(135deg,#06152c,#09264a 55%,#071a35);color:var(--text);
+ font:14px/1.45 Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input{font:inherit}
+button{cursor:pointer}
+.app{max-width:1680px;margin:auto;padding:18px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:16px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-mark{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,#1688ed,#28d8e8);
+ display:grid;place-items:center;font-size:20px;font-weight:800;color:#06213e;box-shadow:0 5px 20px #1688ed44}
+h1{font-size:20px;margin:0;font-weight:700;letter-spacing:.1px}
+.subtitle{font-size:12px;color:var(--muted);margin-top:3px}
+.top-actions{display:flex;align-items:center;gap:12px}
+.connection{font-size:12px;color:var(--green);display:flex;align-items:center;gap:7px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.sync-btn{border:0;border-radius:7px;padding:10px 15px;background:linear-gradient(110deg,#1689ec,#16b9d4);color:white;font-weight:700;box-shadow:0 5px 16px #087fd544}
+.sync-btn:disabled{opacity:.55;cursor:wait}
+.dashboard{display:grid;grid-template-columns:minmax(220px, .85fr) minmax(440px,2fr) minmax(220px,.85fr);gap:10px;align-items:stretch}
+.column{display:flex;flex-direction:column;gap:10px;min-width:0}
+.panel{background:linear-gradient(145deg,rgba(15,48,86,.97),rgba(10,37,70,.98));border:1px solid var(--line);
+ border-radius:8px;padding:15px;box-shadow:0 8px 24px #020d1d25;min-width:0}
+.panel-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.panel h2{font-size:13px;letter-spacing:.2px;margin:0;font-weight:650}
+.eyebrow{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#75a5d3}
+.muted{color:var(--muted)}
+.big-number{font-size:30px;font-weight:750;line-height:1.1;margin-top:5px;letter-spacing:-1px}
+.small-number{font-size:20px;font-weight:700}
+.metric-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #1a426b}
+.metric-row:last-child{border-bottom:0;padding-bottom:0}
+.metric-label{font-size:12px;color:var(--muted)}
+.metric-value{font-weight:700;font-variant-numeric:tabular-nums}
+.cyan{color:var(--cyan)}.green{color:var(--green)}.orange{color:var(--orange)}.red{color:var(--red)}.blue{color:#59b6ff}
+.donut-wrap{display:flex;justify-content:center;align-items:center;padding:4px 0 10px}
+.donut{width:150px;height:150px;border-radius:50%;display:grid;place-items:center;position:relative;
+ background:conic-gradient(var(--green) 0deg 360deg)}
+.donut:before{content:"";position:absolute;width:106px;height:106px;border-radius:50%;background:#0d2a50}
+.donut-inner{position:relative;text-align:center}
+.donut-inner strong{display:block;font-size:27px;line-height:1.1}
+.donut-inner span{font-size:10px;color:var(--muted)}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px}
+.legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted)}
+.swatch{width:8px;height:8px;border-radius:2px;flex:none}
+.mini-bars{height:112px;display:flex;align-items:end;gap:10px;padding:8px 4px 0;border-bottom:1px solid #1c4774}
+.bar-group{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:end;height:100%;gap:6px;min-width:0}
+.bar{width:min(28px,75%);min-height:3px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#2bd7e8,#1689ed);box-shadow:0 0 12px #1689ed33}
+.bar-label{font-size:9px;color:var(--muted);white-space:nowrap}
+.bar-value{font-size:10px;color:#dceeff}
+.center-top{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.stat{background:#0b2546;border:1px solid #1b4772;border-radius:7px;padding:12px}
+.stat .label{font-size:10px;color:var(--muted)}
+.stat .value{font-size:25px;font-weight:750;margin-top:5px}
+.chart-area{height:190px;position:relative;padding:12px 4px 24px}
+.chart-grid{position:absolute;inset:12px 0 25px;display:flex;flex-direction:column;justify-content:space-between}
+.grid-line{border-top:1px solid #1a426b;position:relative}
+.grid-line span{position:absolute;right:0;top:-10px;background:#0d2a50;padding-left:5px;font-size:9px;color:#7095bd}
+.repo-bars{height:100%;display:flex;align-items:end;gap:clamp(5px,1.2vw,14px);position:relative;padding:0 8px;overflow:hidden}
+.repo-bar-wrap{height:100%;flex:1;min-width:0;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:6px}
+.repo-bar{width:min(32px,80%);min-height:3px;border-radius:4px 4px 0 0;background:linear-gradient(180deg,#2ad9e8,#218df0);box-shadow:0 0 14px #1689ed33}
+.repo-bar.dirty{background:linear-gradient(180deg,#ffc078,#f18a52)}
+.repo-bar-label{font-size:9px;color:var(--muted);max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chart-note{font-size:10px;color:var(--muted);margin-top:4px}
+.repo-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;flex-wrap:wrap}
+.search{background:#081e39;border:1px solid #24517e;border-radius:6px;padding:8px 10px;color:var(--text);width:210px;max-width:100%;outline:none}
+.search:focus{border-color:var(--cyan)}
+.repo-list{display:flex;flex-direction:column;gap:0;max-height:390px;overflow:auto}
+.repo-row{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(80px,.7fr) minmax(95px,.8fr);gap:10px;align-items:center;padding:10px 3px;border-bottom:1px solid #1a426b}
+.repo-row:last-child{border-bottom:0}
+.repo-name{font-weight:650;font-size:12px;overflow-wrap:anywhere}
+.repo-folder{font-size:10px;color:var(--muted);margin-top:3px;overflow-wrap:anywhere}
+.repo-link{color:inherit;text-decoration:none}.repo-link:hover{color:var(--cyan)}
+.pill{display:inline-flex;align-items:center;gap:5px;border-radius:20px;padding:4px 8px;font-size:10px;background:#183d5e;color:var(--green);white-space:nowrap}
+.pill.dirty{color:var(--orange)}.pill.ahead{color:#65bdff}.pill.behind,.pill.error{color:var(--red)}
+.sync-count{font-size:11px;color:#c5def5;white-space:nowrap}
+.activity{font-size:11px;line-height:1.65;color:var(--muted);white-space:pre-wrap;overflow-wrap:anywhere;max-height:190px;overflow:auto}
+.activity-state{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--muted);margin-bottom:9px}
+.activity-dot{width:7px;height:7px;border-radius:50%;background:var(--cyan)}
+.progress{height:7px;border-radius:10px;background:#183d5e;overflow:hidden;margin:8px 0 5px}
+.progress>span{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#1689ed,#28d8e8);width:0}
+.footer{font-size:10px;color:#7095bd;text-align:center;padding:10px}
+.empty{padding:22px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:1050px){.dashboard{grid-template-columns:minmax(190px,.8fr) minmax(0,2fr)}.right-col{grid-column:1/-1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.right-col .panel{min-width:0}}
+@media(max-width:700px){.app{padding:12px}.topbar{align-items:flex-start}.connection{display:none}.dashboard{grid-template-columns:1fr}.right-col{grid-column:auto;display:flex}.center-top{grid-template-columns:repeat(2,minmax(0,1fr))}.repo-row{grid-template-columns:minmax(0,1.3fr) minmax(75px,.7fr)}.repo-row .sync-count{grid-column:1/-1;padding-left:2px}.repo-bars{gap:5px}.panel{padding:13px}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">GH</div>
+      <div><h1>GitHub Repository Analytics</h1><div class="subtitle" id="lastUpdated">Loading repository information…</div></div>
+    </div>
+    <div class="top-actions">
+      <div class="connection"><span class="dot"></span><span id="connectionText">Connecting</span></div>
+      <button class="sync-btn" id="syncButton" onclick="syncAll()">↻ Sync all</button>
+    </div>
+  </header>
 
-      <section class="cards">
-        <div class="card">
-          <small>Total repositories</small>
-          <div class="number" id="total">--</div>
-        </div>
-        <div class="card">
-          <small>Clean repositories</small>
-          <div class="number green" id="clean">--</div>
-        </div>
-        <div class="card">
-          <small>Uncommitted changes</small>
-          <div class="number yellow" id="modified">--</div>
-        </div>
-        <div class="card">
-          <small>Unpushed commits</small>
-          <div class="number blue" id="ahead">--</div>
-        </div>
-        <div class="card">
-          <small>Behind GitHub</small>
-          <div class="number red" id="behind">--</div>
-        </div>
-        <div class="card">
-          <small>Recovery folders</small>
-          <div class="number" id="recovery">--</div>
+  <main class="dashboard">
+    <aside class="column left-col">
+      <section class="panel">
+        <div class="panel-head"><h2>Repository health</h2><span class="eyebrow">Overview</span></div>
+        <div class="donut-wrap"><div class="donut" id="healthDonut"><div class="donut-inner"><strong id="healthPercent">—</strong><span>HEALTHY</span></div></div></div>
+        <div class="legend">
+          <div class="legend-item"><i class="swatch" style="background:var(--green)"></i>Clean <b id="legendClean">0</b></div>
+          <div class="legend-item"><i class="swatch" style="background:var(--orange)"></i>Changes <b id="legendDirty">0</b></div>
+          <div class="legend-item"><i class="swatch" style="background:var(--blue)"></i>Ahead <b id="legendAhead">0</b></div>
+          <div class="legend-item"><i class="swatch" style="background:var(--red)"></i>Behind <b id="legendBehind">0</b></div>
         </div>
       </section>
 
-      <div class="panel">
-        <div class="toolbar">
-          <h2>Repositories</h2>
-          <input
-            id="search"
-            placeholder="Search repositories..."
-            oninput="renderRows()"
-          />
+      <section class="panel">
+        <div class="panel-head"><h2>Local changes</h2><span class="eyebrow">By category</span></div>
+        <div class="mini-bars" id="changeBars">
+          <div class="bar-group"><div class="bar" style="height:3px"></div><span class="bar-label">Modified</span></div>
+          <div class="bar-group"><div class="bar" style="height:3px"></div><span class="bar-label">Untracked</span></div>
+          <div class="bar-group"><div class="bar" style="height:3px"></div><span class="bar-label">Deleted</span></div>
         </div>
-        <div style="overflow-x: auto">
-          <table>
-            <thead>
-              <tr>
-                <th>Repository</th>
-                <th>Status</th>
-                <th>Changes</th>
-                <th>GitHub sync</th>
-              </tr>
-            </thead>
-            <tbody id="repos">
-              <tr>
-                <td colspan="4">Loading...</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <div class="metric-row"><span class="metric-label">Repositories with changes</span><b class="metric-value orange" id="dirtyRepos">0</b></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Workspace summary</h2><span class="eyebrow">Local</span></div>
+        <div class="metric-row"><span class="metric-label">Total repositories</span><b class="metric-value" id="leftTotal">—</b></div>
+        <div class="metric-row"><span class="metric-label">Clean repositories</span><b class="metric-value green" id="leftClean">—</b></div>
+        <div class="metric-row"><span class="metric-label">Recovery folders</span><b class="metric-value cyan" id="leftRecovery">—</b></div>
+      </section>
+    </aside>
+
+    <section class="column center-col">
+      <div class="center-top">
+        <div class="stat"><div class="label">TOTAL REPOSITORIES</div><div class="value" id="total">—</div></div>
+        <div class="stat"><div class="label">CLEAN</div><div class="value green" id="clean">—</div></div>
+        <div class="stat"><div class="label">UNCOMMITTED</div><div class="value orange" id="modified">—</div></div>
+        <div class="stat"><div class="label">NEEDS SYNC</div><div class="value blue" id="needsSync">—</div></div>
       </div>
 
-      <div class="panel">
-        <h2>Synchronization activity</h2>
-        <div id="message">Ready.</div>
-      </div>
+      <section class="panel">
+        <div class="panel-head"><h2>Repository status distribution</h2><span class="eyebrow">Current snapshot</span></div>
+        <div class="chart-area"><div class="chart-grid"><div class="grid-line"><span id="chartMax">0</span></div><div class="grid-line"></div><div class="grid-line"></div><div class="grid-line"></div></div><div class="repo-bars" id="repoChart"></div></div>
+        <div class="chart-note">Bars show the number of local file changes for each repository. Repositories without changes remain at baseline.</div>
+      </section>
 
-      <footer>
-        Local dashboard · Documents/Projects · GitHub is the source of truth for
-        repository existence.
-      </footer>
-    </main>
+      <section class="panel">
+        <div class="repo-toolbar"><div><h2>Repositories</h2><div class="subtitle" id="repoCount">All tracked repositories</div></div><input class="search" id="search" placeholder="Search repositories…" oninput="renderRows()"></div>
+        <div class="repo-list" id="repos"><div class="empty">Loading repositories…</div></div>
+      </section>
+    </section>
 
-    <script>
-      let repositories = [];
+    <aside class="column right-col">
+      <section class="panel">
+        <div class="panel-head"><h2>GitHub synchronization</h2><span class="eyebrow">Remote</span></div>
+        <div class="eyebrow">Unpushed commits</div><div class="big-number blue" id="ahead">—</div>
+        <div class="progress"><span id="aheadProgress"></span></div>
+        <div class="metric-row"><span class="metric-label">Repositories ahead</span><b class="metric-value blue" id="aheadRepos">0</b></div>
+        <div class="metric-row"><span class="metric-label">Repositories behind</span><b class="metric-value red" id="behind">—</b></div>
+        <div class="metric-row"><span class="metric-label">In sync</span><b class="metric-value green" id="inSync">—</b></div>
+      </section>
 
-      async function loadDashboard() {
-        try {
-          const response = await fetch("/api/status");
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error);
+      <section class="panel">
+        <div class="panel-head"><h2>Recovery centre</h2><span class="eyebrow">Safety</span></div>
+        <div class="big-number cyan" id="recovery">—</div><div class="subtitle">Recovery folders detected</div>
+        <div class="metric-row"><span class="metric-label">Local modifications</span><b class="metric-value orange" id="changeFiles">0</b></div>
+        <div class="metric-row"><span class="metric-label">Deleted locally</span><b class="metric-value red" id="deletedFiles">0</b></div>
+      </section>
 
-          repositories = data.repositories || [];
-
-          document.getElementById("total").textContent = data.total;
-          document.getElementById("clean").textContent = data.clean;
-          document.getElementById("modified").textContent = data.modified;
-          document.getElementById("ahead").textContent = data.ahead;
-          document.getElementById("behind").textContent = data.behind;
-          document.getElementById("recovery").textContent = data.recovery_count;
-
-          document.getElementById("lastUpdated").textContent =
-            "Last dashboard refresh: " + new Date().toLocaleString();
-
-          renderRows();
-        } catch (error) {
-          document.getElementById("message").textContent =
-            "Dashboard error: " + error.message;
-        }
-      }
-
-      function renderRows() {
-        const query = document.getElementById("search").value.toLowerCase();
-        const filtered = repositories.filter((repo) =>
-          repo.name.toLowerCase().includes(query),
-        );
-
-        const tbody = document.getElementById("repos");
-
-        if (!filtered.length) {
-          tbody.innerHTML =
-            '<tr><td colspan="4">No repositories found.</td></tr>';
-          return;
-        }
-
-        tbody.innerHTML = filtered
-          .map((repo) => {
-            const changes = [
-              ...(repo.modified || []).map((x) => "Modified: " + x),
-              ...(repo.untracked || []).map((x) => "Untracked: " + x),
-              ...(repo.deleted || []).map((x) => "Deleted locally: " + x),
-            ];
-
-            const isDirty = changes.length > 0;
-            const statuses = [];
-
-            if (repo.error) statuses.push("Status unavailable");
-            else if (!isDirty) statuses.push("Clean");
-            else statuses.push("Uncommitted changes");
-
-            if (repo.ahead) statuses.push(repo.ahead + " ahead");
-            if (repo.behind) statuses.push(repo.behind + " behind");
-
-            const badgeClass = repo.error
-              ? "behind"
-              : isDirty
-                ? "dirty"
-                : repo.ahead
-                  ? "ahead"
-                  : "clean";
-
-            const detail =
-              changes.slice(0, 8).join("\n") +
-              (changes.length > 8 ? "\n...more files" : "");
-
-            return `
-      <tr>
-        <td>
-          <strong>${escapeHTML(repo.name)}</strong>
-          <small>${escapeHTML(repo.folder)}</small>
-        </td>
-        <td>
-          <span class="status ${badgeClass}">
-            ${escapeHTML(statuses.join(" · "))}
-          </span>
-        </td>
-        <td class="files">
-          ${
-            repo.error
-              ? escapeHTML(repo.error)
-              : changes.length
-                ? `<details><summary>${changes.length} file(s)</summary>
-               <pre>${escapeHTML(detail)}</pre></details>`
-                : "No file changes"
-          }
-        </td>
-        <td>
-          ${
-            repo.error
-              ? "Unknown"
-              : `${repo.ahead || 0} ahead / ${repo.behind || 0} behind`
-          }
-        </td>
-      </tr>`;
-          })
-          .join("");
-      }
-
-      function escapeHTML(value) {
-        return String(value).replace(
-          /[&<>"']/g,
-          (c) =>
-            ({
-              "&": "&amp;",
-              "<": "&lt;",
-              ">": "&gt;",
-              '"': "&quot;",
-              "'": "&#39;",
-            })[c],
-        );
-      }
-
-      async function syncAll() {
-        const button = document.getElementById("syncButton");
-        button.disabled = true;
-        button.textContent = "Synchronizing...";
-        document.getElementById("message").textContent =
-          "Fetching GitHub repositories and checking local changes...";
-
-        try {
-          const response = await fetch("/api/sync", { method: "POST" });
-          const data = await response.json();
-
-          if (!response.ok || !data.success) {
-            throw new Error(data.error || "Synchronization failed");
-          }
-
-          const result = data.result;
-          document.getElementById("message").textContent =
-            `Synchronization completed\n\n` +
-            `Cloned: ${result.cloned}\n` +
-            `Fetched: ${result.fetched}\n` +
-            `Deleted: ${result.deleted}\n` +
-            `Moved to recovery: ${result.recovered}\n` +
-            `Errors: ${result.errors.length}\n` +
-            result.errors.join("\n");
-
-          await loadDashboard();
-        } catch (error) {
-          document.getElementById("message").textContent =
-            "Synchronization failed:\n" +
-            error.message +
-            "\nNo deletion should occur when GitHub inventory cannot be retrieved.";
-        } finally {
-          button.disabled = false;
-          button.textContent = "↻ Sync All";
-        }
-      }
-
-      loadDashboard();
-    </script>
-  </body>
+      <section class="panel">
+        <div class="panel-head"><h2>Synchronization activity</h2><span class="eyebrow">Latest run</span></div>
+        <div class="activity-state"><span class="activity-dot" id="activityDot"></span><span id="activityStatus">Waiting for activity</span></div>
+        <div class="activity" id="message">Dashboard ready. Select Sync all to fetch GitHub repositories and refresh local status.</div>
+      </section>
+    </aside>
+  </main>
+  <footer class="footer">Local repository dashboard · GitHub remains the source of truth for repository existence</footer>
+</div>
+<script>
+let repositories=[];
+const $=id=>document.getElementById(id);
+const sum=(items,key)=>items.reduce((n,r)=>n+(r[key]||[]).length,0);
+const changesFor=repo=>(repo.modified||[]).length+(repo.untracked||[]).length+(repo.deleted||[]).length;
+function setText(id,value){$(id).textContent=value}
+function updateDonut(clean,total,dirty){
+  const pct=total?Math.round(clean/total*100):0;
+  setText("healthPercent",pct+"%");
+  const cleanDeg=total?clean/total*360:0,dirtyDeg=total?dirty/total*360:0;
+  const aheadOnly= repositories.filter(r=>!r.error&&(r.ahead||0)>0).length;
+  const behindOnly= repositories.filter(r=>!r.error&&(r.behind||0)>0).length;
+  const aheadDeg=total?aheadOnly/total*360:0;
+  const c1=cleanDeg,c2=c1+dirtyDeg,c3=c2+aheadDeg;
+  $("healthDonut").style.background=`conic-gradient(var(--green) 0deg ${c1}deg,var(--orange) ${c1}deg ${c2}deg,var(--blue) ${c2}deg ${c3}deg,var(--red) ${c3}deg 360deg)`;
+}
+function renderCharts(){
+  const counts=[sum(repositories,"modified"),sum(repositories,"untracked"),sum(repositories,"deleted")];
+  const max=Math.max(1,...counts);
+  $("changeBars").innerHTML=counts.map((v,i)=>`<div class="bar-group"><span class="bar-value">${v}</span><div class="bar" style="height:${Math.max(3,v/max*72)}px;background:${["linear-gradient(180deg,#2bd7e8,#1689ed)","linear-gradient(180deg,#63b8ff,#237fe0)","linear-gradient(180deg,#ff9d87,#e85d76)"][i]}"></div><span class="bar-label">${["Modified","Untracked","Deleted"][i]}</span></div>`).join("");
+  const ranked=[...repositories].sort((a,b)=>changesFor(b)-changesFor(a)).slice(0,12);
+  const topMax=Math.max(1,...ranked.map(changesFor));
+  $("chartMax").textContent=topMax;
+  $("repoChart").innerHTML=ranked.length?ranked.map(r=>`<div class="repo-bar-wrap" title="${escapeHTML(r.name)}: ${changesFor(r)} changes"><div class="repo-bar ${changesFor(r)?"dirty":""}" style="height:${Math.max(2,changesFor(r)/topMax*135)}px"></div><span class="repo-bar-label">${escapeHTML(shortName(r.name))}</span></div>`).join(""):'<div class="empty">No repository data</div>';
+}
+function shortName(name){return name.split("/").pop()}
+function renderRows(){
+  const q=$("search").value.trim().toLowerCase();
+  const filtered=repositories.filter(r=>(r.name+" "+r.folder).toLowerCase().includes(q));
+  setText("repoCount",`${filtered.length} of ${repositories.length} tracked repositories`);
+  if(!filtered.length){$("repos").innerHTML='<div class="empty">No repositories found.</div>';return}
+  $("repos").innerHTML=filtered.map(r=>{
+    const dirty=changesFor(r)>0, error=!!r.error, ahead=r.ahead||0,behind=r.behind||0;
+    const status=error?"Unavailable":dirty?"Changes":behind?"Behind":ahead?"Ahead":"Clean";
+    const cls=error?"error":dirty?"dirty":behind?"behind":ahead?"ahead":"";
+    const url=r.url&&/^https:\/\/github\.com\//.test(r.url)?r.url:null;
+    const name=url?`<a class="repo-link" href="${escapeHTML(url)}" target="_blank" rel="noopener">${escapeHTML(r.name)}</a>`:escapeHTML(r.name);
+    return `<div class="repo-row"><div><div class="repo-name">${name}</div><div class="repo-folder">${escapeHTML(r.folder||"")}</div></div><div><span class="pill ${cls}">${status}</span></div><div class="sync-count">${error?"Status unavailable":`${ahead} ahead · ${behind} behind`}</div></div>`;
+  }).join("");
+}
+function escapeHTML(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+async function loadDashboard(){
+  try{
+    const response=await fetch("/api/status",{cache:"no-store"});
+    const data=await response.json();if(!response.ok)throw new Error(data.error||"Could not load dashboard");
+    repositories=data.repositories||[];
+    const total=data.total??repositories.length,clean=data.clean??0,dirty=data.modified??0;
+    const aheadRepos=repositories.filter(r=>(r.ahead||0)>0).length;
+    const behindRepos=repositories.filter(r=>(r.behind||0)>0).length;
+    const inSync=repositories.filter(r=>!r.error&&!(r.ahead||0)&&!(r.behind||0)).length;
+    const modifiedFiles=sum(repositories,"modified")+sum(repositories,"untracked");
+    setText("total",total);setText("clean",clean);setText("modified",dirty);
+    setText("needsSync",aheadRepos+behindRepos);setText("ahead",aheadRepos);setText("aheadRepos",aheadRepos);
+    setText("behind",behindRepos);setText("inSync",inSync);setText("recovery",data.recovery_count??0);
+    setText("leftTotal",total);setText("leftClean",clean);setText("leftRecovery",data.recovery_count??0);
+    setText("dirtyRepos",dirty);setText("changeFiles",modifiedFiles);setText("deletedFiles",sum(repositories,"deleted"));
+    setText("legendClean",clean);setText("legendDirty",dirty);setText("legendAhead",aheadRepos);setText("legendBehind",behindRepos);
+    $("aheadProgress").style.width=(total?aheadRepos/total*100:0)+"%";
+    updateDonut(clean,total,dirty);renderCharts();renderRows();
+    setText("lastUpdated","Last refreshed: "+new Date().toLocaleString());
+    setText("connectionText","Dashboard connected");
+    $("activityDot").style.background="var(--green)";
+  }catch(error){setText("connectionText","Connection issue");$("activityDot").style.background="var(--red)";setText("activityStatus","Could not refresh dashboard");setText("message","Dashboard error: "+error.message)}
+}
+async function syncAll(){
+  const button=$("syncButton");button.disabled=true;button.textContent="Synchronizing…";
+  setText("activityStatus","Synchronizing with GitHub");$("activityDot").style.background="var(--orange)";
+  setText("message","Fetching GitHub repositories and checking local changes…");
+  try{
+    const response=await fetch("/api/sync",{method:"POST"});const data=await response.json();
+    if(!response.ok||!data.success)throw new Error(data.error||"Synchronization failed");
+    const r=data.result;
+    setText("message",`Synchronization completed\n\nCloned: ${r.cloned}\nFetched: ${r.fetched}\nDeleted: ${r.deleted}\nMoved to recovery: ${r.recovered}\nErrors: ${(r.errors||[]).length}${(r.errors||[]).length?"\n\n"+r.errors.join("\n"):""}`);
+    setText("activityStatus",r.errors?.length?"Completed with errors":"Synchronization completed");
+    $("activityDot").style.background=r.errors?.length?"var(--orange)":"var(--green)";
+    await loadDashboard();
+  }catch(error){
+    setText("activityStatus","Synchronization failed");$("activityDot").style.background="var(--red)";
+    setText("message","Synchronization failed:\n"+error.message+"\n\nNo deletion should occur when GitHub inventory cannot be retrieved.");
+  }finally{button.disabled=false;button.textContent="↻ Sync all"}
+}
+loadDashboard();
+</script>
+</body>
 </html>
